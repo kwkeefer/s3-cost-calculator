@@ -1,10 +1,12 @@
 import argparse
 import os
+from typing import Union
 
 from .utils import _read_config_file, format_float
 
 
-def _calculate_s3_standard_or_ia_storage_cost(pricing_data, s3_storage_type, total_gb_stored):
+def _calculate_s3_standard_or_ia_storage_cost(pricing_data: dict, s3_storage_type: str,
+                                              total_gb_stored: Union[int, float]):
     """ Calculate monthly storage cost for S3 frequent or infrequent access """
     if s3_storage_type not in ['frequent', 'infrequent']:
         raise ValueError
@@ -12,7 +14,9 @@ def _calculate_s3_standard_or_ia_storage_cost(pricing_data, s3_storage_type, tot
     return total_gb_stored * pricing_data[s3_storage_type]['storage_per_gb']
 
 
-def _calculate_glacier_or_deep_glacier_storage_cost(pricing_data, s3_storage_type, number_of_objects, total_gb_stored):
+def _calculate_glacier_or_deep_glacier_storage_cost(pricing_data: dict, s3_storage_type: str,
+                                                    number_of_objects: Union[int, float],
+                                                    total_gb_stored: Union[int, float]) -> float:
     """
     Calculate monthly cost for S3 glacier or deep glacier.
 
@@ -33,7 +37,19 @@ def _calculate_glacier_or_deep_glacier_storage_cost(pricing_data, s3_storage_typ
     return metadata_cost_1 + metadata_cost_2 + storage_cost
 
 
-def calculate_storage_costs(pricing_data, s3_storage_type, total_gb_stored, number_of_objects=None):
+def calculate_storage_costs(pricing_data: dict, s3_storage_type: str, total_gb_stored: Union[int, float],
+                            number_of_objects: Union[int, float] = None) -> float:
+    """ Calculate storage costs for all storage types
+
+    Args:
+        pricing_data: dictionary containing pricing data for all storage types
+        s3_storage_type: which s3 storage type to check costs for
+        total_gb_stored: how many total gbs are being stored
+        number_of_objects: how many objects are being stored
+
+    Returns: (float) price
+
+    """
     if s3_storage_type not in ['frequent', 'infrequent', 'glacier', 'deep_glacier']:
         raise ValueError
 
@@ -44,21 +60,25 @@ def calculate_storage_costs(pricing_data, s3_storage_type, total_gb_stored, numb
                                                                total_gb_stored)
 
 
-def _calculate_standard_or_ia_retrieval_costs(pricing_data, s3_storage_type, number_of_objects, total_gb_retrieved):
+def _calculate_standard_or_ia_retrieval_costs(pricing_data: dict, s3_storage_type: str,
+                                              number_of_objects: Union[int, float],
+                                              total_gb_retrieved: Union[int, float]) -> float:
     per_obj_costs = pricing_data[s3_storage_type]['1000_get_requests'] * number_of_objects
     per_gb_costs = pricing_data[s3_storage_type]['data_retrievals_per_gb'] * total_gb_retrieved
     return per_gb_costs + per_obj_costs
 
 
-def calculate_transition_costs(pricing_data, s3_storage_type_to_transition_to, number_of_objects):
+def calculate_transition_costs(pricing_data: dict, s3_storage_type_to_transition_to: str,
+                               number_of_objects: Union[int, float]):
     if s3_storage_type_to_transition_to not in ['frequent', 'infrequent', 'glacier', 'deep_glacier']:
         raise ValueError
 
     return number_of_objects * pricing_data[s3_storage_type_to_transition_to]['1000_lifecycle_transition_into']
 
 
-def calculate_retrieval_costs(pricing_data, s3_storage_type, number_of_objects, total_gb_retrieved,
-                              temporary_restore_duration=None):
+def calculate_retrieval_costs(pricing_data: dict, s3_storage_type: str, number_of_objects: Union[int, float],
+                              total_gb_retrieved: Union[int, float],
+                              temporary_restore_duration: int = None) -> float:
     """
     Amazon S3 objects that are stored in the S3 Glacier or S3 Glacier Deep Archive storage classes 
     are not immediately accessible. To access an object in these storage classes, you must restore a 
@@ -77,7 +97,8 @@ def calculate_retrieval_costs(pricing_data, s3_storage_type, number_of_objects, 
     return per_gb_costs + per_obj_costs + temp_storage_costs + read_costs
 
 
-def calculate_costs(pricing_data, s3_storage_type_to_transition_to, number_of_objects, total_gb):
+def calculate_costs(pricing_data: dict, s3_storage_type_to_transition_to: str, number_of_objects: Union[int, float],
+                    total_gb: Union[int, float]) -> dict:
     """ Calculate amount of time (in months) required to break even when transitioning
      from frequent access to another storage type. """
 
@@ -119,7 +140,8 @@ def calculate_costs(pricing_data, s3_storage_type_to_transition_to, number_of_ob
     return costs
 
 
-def calculate_costs_for_all_storage_types(pricing_data, number_of_objects, total_gb, outfile):
+def calculate_costs_for_all_storage_types(pricing_data: dict, number_of_objects: Union[int, float],
+                                          total_gb: Union[int, float], outfile: str):
     if outfile is None:
         outfile = f"s3_storage_calculations__{total_gb}gb_{number_of_objects}objects.csv"
 
