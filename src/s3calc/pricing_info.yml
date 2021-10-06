@@ -1,0 +1,26 @@
+# storage prices per GB assumes 500+ terabytes being stored
+us-west-2:
+  frequent:
+    storage_per_gb: 0.021
+    1000_get_requests: 0.0004
+    1000_lifecycle_transition_into: 0
+    1000_data_retrieval_requests: 0
+    data_retrievals_per_gb: 0
+  infrequent: # multiple zone IA
+    storage_per_gb: 0.0125
+    1000_get_requests: 0.001
+    1000_lifecycle_transition_into: 0.01
+    1000_data_retrieval_requests: 0
+    data_retrievals_per_gb: 0.01
+  glacier:
+    storage_per_gb: 0.004
+    1000_get_requests: 0.0004
+    1000_lifecycle_transition_into: 0.03
+    1000_data_retrieval_requests: 0.025 # bulk retrieval price used
+    data_retrievals_per_gb: 0.0025 # bulk retrieval price used
+  deep_glacier:
+    storage_per_gb: 0.00099
+    1000_get_requests: 0.0004
+    1000_lifecycle_transition_into: 0.05
+    1000_data_retrieval_requests: 0.025 # bulk retrieval price used
+    data_retrievals_per_gb: 0.0025 # bulk retrieval price used

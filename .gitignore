@@ -1,0 +1,3 @@
+src/s3calc.egg-info/**
+*.csv
+**/**/.DS_Store
