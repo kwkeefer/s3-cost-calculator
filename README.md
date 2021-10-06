@@ -13,7 +13,7 @@ optional arguments:
   --outfile OUTFILE     Name / path to write output csv file.
 ```
 
-By default the application will use the pricing config file located in [pricing_info.yml](./src/s3calc/pricing_info.yml). 
+By default, the application will use the pricing config file located in [pricing_info.yml](./src/s3calc/pricing_info.yml). 
 You can pass in another config file with updated prices by passing in another config file using the `--config` flag.
 
 Note that pricing for the Glacier and Deep Glacier retrieval costs assumes that the data will be stored temporarily for 14 days.
