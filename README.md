@@ -1,5 +1,7 @@
 # s3-cost-calculator
 
+A tool to help determine costs related to transitioning between storage tiers.
+
 ```
 usage: s3calc [-h] [--region REGION] [--config CONFIG] [--gb GB] [--number_of_objects NUMBER_OF_OBJECTS] [--outfile OUTFILE]
 
